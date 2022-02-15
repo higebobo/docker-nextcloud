@@ -1,0 +1,63 @@
+version: "3.7"
+
+services:
+  app:
+    image: nextcloud:23.0-fpm-alpine
+    container_name: ${APP_CONTAINER}
+    restart: always
+    environment:
+      - extra_params="--o:ssl.enable=false"
+    depends_on:
+      - db
+      - onlyoffice-document-server
+      - elasticsearch
+    volumes:
+      - "$PWD/data/web:/var/www/html:rw"
+  db:
+    image: mariadb:10.7-focal
+    container_name: ${DB_CONTAINER}
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --skip-innodb-read-only-compressed
+    restart: always
+    volumes:
+      - "$PWD/data/db:/var/lib/mysql"
+    #ports:
+    #  - ${MYSQL_PORT}:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+  onlyoffice-document-server:
+    image: onlyoffice/documentserver:7.0
+    container_name: ${DOC_CONTAINER}
+    restart: always
+    volumes:
+      - "$PWD/data/log/onlyoffice:/var/log/onlyoffice"
+      - "$PWD/data/onlyoffice:/var/www/onlyoffice/Data"
+  nginx:
+    image: nginx:1.21
+    container_name: ${WEB_CONTAINER}
+    restart: always
+    ports:
+      - "${WEB_PORT}:80"
+      #- "${SSL_PORT}:443"
+    volumes:
+      - "$PWD/config/nginx.conf:/etc/nginx/nginx.conf"
+      - "$PWD/data/web:/var/www/html"
+  elasticsearch:
+    build: ./elasticsearch
+    container_name: ${SEARCH_CONTAINER}
+    restart: always
+    environment:
+      - discovery.type=single-node
+#    ports:
+#      - "${SEARCH_PORT}:9200"
+#      #- "${ELASTICSEARCH_NODE_PORT}:9300"
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:7.17.0
+#    container_name: ${MONITOR_CONTAINER}
+#    restart: always
+#    depends_on:
+#      - "elasticsearch"
+#    ports:
+#      - "${MONITOR_PORT}:5601"
