@@ -132,11 +132,8 @@ version: version-web ## Show version
 version-web:
 	@docker exec -it ${WEB_CONTAINER} 'nginx' '-v'
 
-version-search: ## Check version for elasticsearch
-	@docker exec -it -u elasticsearch ${APP_CONTAINER} 'elasticsearch' '--version'
-
-version-monitor: ## Check version for kibana
-	@docker exec -it -u kibana ${MONITOR_CONTAINER} 'kibana' '--version'
+version-app:
+	@docker exec -it ${APP_CONTAINER} 'php' '-v'
 
 version-db:
 	@docker exec -it ${DB_CONTAINER} 'mysql' '-V'
