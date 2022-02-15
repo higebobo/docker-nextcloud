@@ -7,8 +7,10 @@ SHELL := /bin/bash
 .PHONY: $(shell egrep -o ^[a-zA-Z_-]+: $(MAKEFILE_LIST) | sed 's/://')
 
 WEB_PORT=8080
+#SSL_PORT=443
 SEARCH_PORT=9200
-MONITOR_PORT=5601
+#SEARCH_NODE_PORT=9300
+#MONITOR_PORT=5601
 MYSQL_ROOT_PASSWORD=secret
 #MYSQL_PORT=3306
 MYSQL_USER=nextcloud
@@ -22,8 +24,10 @@ ifneq ("$(wildcard ./.env)","")
 endif
 
 export WEB_PORT
+#export SSL_PORT
 export SEARCH_PORT
-export MONITOR_PORT
+#export SEARCH_NODE_PORT
+#export MONITOR_PORT
 export MYSQL_ROOT_PASSWORD
 #export MYSQL_PORT
 export MYSQL_USER
@@ -34,7 +38,7 @@ export WEB_CONTAINER=nginx-server
 export APP_CONTAINER=app-server
 export DOC_CONTAINER=onlyoffice-document-server
 export SEARCH_CONTAINER=elasticsearch-server
-export MONITOR_CONTAINER=kibana-server
+#export MONITOR_CONTAINER=kibana-server
 export DB_CONTAINER=mariadb-server
 
 up: ## Docker process up
@@ -123,7 +127,18 @@ shell-search: ## Shell for search server
 shell-db: ## Shell process for database
 	@docker exec -it ${DB_CONTAINER} /bin/sh
 
-version:
+version: version-web ## Show version
+
+version-web:
+	@docker exec -it ${WEB_CONTAINER} 'nginx' '-v'
+
+version-search: ## Check version for elasticsearch
+	@docker exec -it -u elasticsearch ${APP_CONTAINER} 'elasticsearch' '--version'
+
+version-monitor: ## Check version for kibana
+	@docker exec -it -u kibana ${MONITOR_CONTAINER} 'kibana' '--version'
+
+version-db:
 	@docker exec -it ${DB_CONTAINER} 'mysql' '-V'
 
 mysql:
