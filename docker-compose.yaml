@@ -52,7 +52,7 @@ services:
       - discovery.type=single-node
 #    ports:
 #      - "${SEARCH_PORT}:9200"
-#      #- "${EARCH_NODE_PORT}:9300"
+#      #- "${SEARCH_NODE_PORT}:9300"
 #  kibana:
 #    image: docker.elastic.co/kibana/kibana:7.17.0
 #    container_name: ${MONITOR_CONTAINER}
