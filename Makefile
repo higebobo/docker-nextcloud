@@ -53,7 +53,7 @@ restart: ## Docker process restart
 down-all: down ## Docker process down all
 	@docker-compose down --rmi all --volumes
 
-clean: ## Docker clean
+clean: down ## Docker clean
 	@sudo rm -fr ./data/*
 
 onlyoffice: ## Set up Only Office
@@ -93,19 +93,19 @@ log: ## Docker log
 	@docker-compose logs
 
 log-web: ## Docker log for web server
-	@docker-compose logs ${WEB_CONTAINER}
+	@docker-compose logs | grep ${WEB_CONTAINER}
 
 log-app: ## Docker log for application server
-	@docker-compose logs ${APP_CONTAINER}
+	@docker-compose logs | grep ${APP_CONTAINER}
 
 log-doc: ## Docker log for document server
-	@docker-compose logs ${DOC_CONTAINER}
+	@docker-compose logs | grep ${DOC_CONTAINER}
 
 log-search: ## Docker log for search server
-	@docker-compose logs ${SEARCH_CONTAINER}
+	@docker-compose logs | grep ${SEARCH_CONTAINER}
 
 log-db: ## Docker log for database
-	@docker-compose logs ${DB_CONTAINER}
+	@docker-compose logs | grep ${DB_CONTAINER}
 
 shell: shell-app-www ## Shell
 
@@ -129,32 +129,34 @@ shell-db: ## Shell process for database
 
 version: version-web ## Show version
 
-version-web:
+version-web: ## Show version for web server
 	@docker exec -it ${WEB_CONTAINER} 'nginx' '-v'
 
-version-app:
+version-app: ## Show version for app server
 	@docker exec -it ${APP_CONTAINER} 'php' '-v'
 
-version-db:
+version-db: ## Show version for dataabse server
 	@docker exec -it ${DB_CONTAINER} 'mysql' '-V'
 
-mysql:
+mysql: ## Mysql console
 	@docker exec -it ${DB_CONTAINER} /bin/sh -c 'mysql -u root --password=${MYSQL_ROOT_PASSWORD}'
 
-test:
+test: test-web ## Testing container
+
+test-web: ## Testing container for web server
 	@curl -LI http://localhost:${WEB_PORT} -o /dev/null -w'%{http_code}\n' -s
 
-test-db-info:
+test-db-info: ## Testing container for database information
 	@docker exec -it ${DB_CONTAINER} /bin/sh -c 'mysql -u root --password=${MYSQL_ROOT_PASSWORD} -e "SHOW VARIABLES LIKE \"chara%\""'
 
-test-user:
+test-user: ## Testing container for database user
 	@docker exec -it ${DB_CONTAINER} /bin/sh -c 'mysql -u root --password=${MYSQL_ROOT_PASSWORD} -e "SELECT host, user, select_priv FROM mysql.user"'
 
-test-db:
+test-db: ## Testing container for database server
 	@docker exec -it ${DB_CONTAINER} /bin/sh -c 'mysql -u root --password=${MYSQL_ROOT_PASSWORD} -e "SHOW DATABASES;"'
 
-test-search:
-	@docker exec -u www-data -it ${APP_CONTAINER} /bin/sh -c 'curl -X GET http://elasticsearch:${SEARCH_PORT}/_cat/health'
+#test-search: ## Testing container for search server
+#	@docker exec -u www-data -it ${APP_CONTAINER} /bin/sh -c 'curl -X GET http://elasticsearch:${SEARCH_PORT}/_cat/health'
 
 help: ## Print this help
 	@echo 'Usage: make [target]'
