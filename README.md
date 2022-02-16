@@ -34,7 +34,7 @@ Access web server (ex http://localhost:8080) and set up
         * Username: `${MYSQL_USER}`
         * Password: `${MYSQL_PASSWORD}`
         * Database: `${MYSQL_DATABASE}`
-        * `db`: (**IMPORTANT**) Host must be the docker service name not localhost
+        * `db`: (**IMPORTANT**) Host must be the docker database service name not localhost
 3. Set up OnlyOffice
     ```shell
     make onlyoffice

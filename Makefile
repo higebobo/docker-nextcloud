@@ -50,7 +50,7 @@ down: ## Docker process down
 restart: ## Docker process restart
 	@docker-compose restart
 
-down-all: down ## Docker process down all
+down-all: ## Docker process down all
 	@docker-compose down --rmi all --volumes
 
 clean: down ## Docker clean
